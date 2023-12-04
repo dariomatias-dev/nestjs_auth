@@ -15,11 +15,13 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { TokenIdMatchGuard } from 'src/auth/guards/token-id-match.guard';
 
 import { UUIDParamDto } from 'src/common/dto/uuid-param.dto';
 
 import { IsPublic } from 'src/decorators/is-public.decorator';
 import { Roles } from 'src/decorators/roles.decorator';
+
 import { Role } from 'src/enums/role.enum';
 
 @Controller()
@@ -46,16 +48,19 @@ export class UserController {
     return this.userService.findAll();
   }
 
+  @UseGuards(TokenIdMatchGuard)
   @Get('user/:id')
   findOne(@Param() { id }: UUIDParamDto) {
     return this.userService.findOne(id);
   }
 
+  @UseGuards(TokenIdMatchGuard)
   @Patch('user/:id')
   update(@Param() { id }: UUIDParamDto, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(id, updateUserDto);
   }
 
+  @UseGuards(TokenIdMatchGuard)
   @Delete('user/:id')
   remove(@Param() { id }: UUIDParamDto) {
     return this.userService.remove(id);

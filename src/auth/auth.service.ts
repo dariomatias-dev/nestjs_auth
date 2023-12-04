@@ -59,7 +59,7 @@ export class AuthService {
     expiresIn: string,
   ): Promise<string> {
     const payload = {
-      sub: user.id,
+      id: user.id,
       token_type: tokenType,
       email: user.email,
       roles: user.roles,
