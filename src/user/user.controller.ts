@@ -26,6 +26,13 @@ import { Role } from 'src/enums/role.enum';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Roles(Role.Admin)
+  @UseGuards(RolesGuard)
+  @Post('admin-user')
+  createAdmin(@Body() createUserDto: CreateUserDto) {
+    return this.userService.createAdmin(createUserDto);
+  }
+
   @IsPublic()
   @Post('user')
   create(@Body() createUserDto: CreateUserDto) {

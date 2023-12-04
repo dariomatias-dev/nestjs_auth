@@ -13,14 +13,28 @@ import { Role } from 'src/enums/role.enum';
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async createAdmin(createUserDto: CreateUserDto) {
+    const encryptedPassword = await bcrypt.hash(createUserDto.password, 10);
+
+    const user = await this.prisma.users.create({
+      data: {
+        ...createUserDto,
+        password: encryptedPassword,
+        roles: [Role.Admin],
+      },
+    });
+
+    return this.removePassword(user);
+  }
+
   async create(createUserDto: CreateUserDto) {
     const encryptedPassword = await bcrypt.hash(createUserDto.password, 10);
 
     const user = await this.prisma.users.create({
       data: {
         ...createUserDto,
-        roles: [Role.User],
         password: encryptedPassword,
+        roles: [Role.User],
       },
     });
 
