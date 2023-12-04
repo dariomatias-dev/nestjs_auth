@@ -7,6 +7,9 @@ import {
 
 import { AppModule } from './app.module';
 
+import { PrismaNotFoundExceptionFilter } from './exeception-filters/prisma-not-found.exception-filter';
+import { UniqueFieldExceptionFilter } from './exeception-filters/unique-field.exception-filter';
+
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
@@ -21,6 +24,11 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
       transform: true,
     }),
+  );
+
+  app.useGlobalFilters(
+    new PrismaNotFoundExceptionFilter(),
+    new UniqueFieldExceptionFilter(),
   );
 
   app.enableCors({
