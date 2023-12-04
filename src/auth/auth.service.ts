@@ -4,7 +4,6 @@ import * as bcrypt from 'bcrypt';
 
 import { TokenType } from 'src/enums/token-type.enum';
 
-import { RequestBodyLogin } from './models/request-body-login';
 import { UserFromJwt } from './models/user-from-jwt';
 
 import { UserService } from 'src/user/user.service';
@@ -16,7 +15,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async validateUser({ email, password }: RequestBodyLogin) {
+  async validateUser(email: string, password: string) {
     const user = await this.userService.findByEmail(email);
 
     if (user) {

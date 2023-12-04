@@ -23,7 +23,7 @@ export class LoginGuard implements CanActivate {
 
     await this._validateBody(body);
 
-    const user = await this.authService.validateUser(body);
+    const user = await this.authService.validateUser(body.email, body.password);
 
     if (!user) {
       return false;

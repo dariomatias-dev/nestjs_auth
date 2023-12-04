@@ -2,7 +2,8 @@ import { Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
 
-import { LoginGuard } from './guards/login/login.guard';
+import { LoginGuard } from './guards/login.guard';
+import { RefreshGuard } from './guards/refresh.guard';
 
 import { UserRequest } from './models/user-request';
 
@@ -16,9 +17,9 @@ export class AuthController {
     return this.authService.generateTokens(req.user);
   }
 
+  @UseGuards(RefreshGuard)
   @Get('refresh')
-  refresh() {
-    return '';
-    //return this.authService.generateTokens();
+  refresh(@Req() req: UserRequest) {
+    return this.authService.generateTokens(req.user);
   }
 }
