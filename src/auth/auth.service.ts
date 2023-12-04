@@ -1,10 +1,15 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
 import { TokenType } from 'src/enums/token-type.enum';
 
 import { UserFromJwt } from './models/user-from-jwt';
+import { UserRequest } from './models/user-request';
 
 import { UserService } from 'src/user/user.service';
 
@@ -66,5 +71,49 @@ export class AuthService {
     });
 
     return token;
+  }
+
+  async verifyToken(context: ExecutionContext, tokenType: TokenType) {
+    const request = context.switchToHttp().getRequest<UserRequest>();
+
+    const token = this._extractTokenFromHeader(request);
+
+    if (!token) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      const payload: UserFromJwt = await this.jwtService.verifyAsync(token, {
+        secret: process.env.JWT_SECRET_KEY,
+      });
+
+      if (payload.token_type != tokenType) {
+        throw new Error();
+      }
+
+      const user = await this.userService.findByEmail(payload.email);
+
+      if (!user) {
+        throw new Error();
+      }
+
+      request.user = payload;
+    } catch (err) {
+      if (err.name == 'TokenExpiredError') {
+        throw new UnauthorizedException('Token has expired');
+      }
+
+      throw new UnauthorizedException('Invalid token');
+    }
+  }
+
+  private _extractTokenFromHeader(req: UserRequest): string | undefined {
+    const authorization = req.headers.authorization;
+
+    if (!authorization) return undefined;
+
+    const [type, token] = authorization.split(' ');
+
+    return type === 'Bearer' ? token : undefined;
   }
 }
