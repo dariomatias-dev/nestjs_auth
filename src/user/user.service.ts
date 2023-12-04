@@ -7,6 +7,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
 
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Role } from 'src/enums/role.enum';
 
 @Injectable()
 export class UserService {
@@ -18,6 +19,7 @@ export class UserService {
     const user = await this.prisma.users.create({
       data: {
         ...createUserDto,
+        roles: [Role.User],
         password: encryptedPassword,
       },
     });
