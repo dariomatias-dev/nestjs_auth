@@ -9,7 +9,7 @@ export class PrismaNotFoundExceptionFilter implements ExceptionFilter {
 
     const errorMessage = exception.meta?.cause ?? exception.message;
 
-    exception.code == 'p2025'
+    exception.code == 'P2025'
       ? reply.status(404).send({
           statusCode: 404,
           errorMessage,

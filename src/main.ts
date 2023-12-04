@@ -7,8 +7,8 @@ import {
 
 import { AppModule } from './app.module';
 
-import { PrismaNotFoundExceptionFilter } from './exeception-filters/prisma-not-found.exception-filter';
-import { UniqueFieldExceptionFilter } from './exeception-filters/unique-field.exception-filter';
+import { PrismaNotFoundExceptionFilter } from './exception-filters/prisma-not-found.exception-filter';
+import { UniqueFieldExceptionFilter } from './exception-filters/unique-field.exception-filter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(

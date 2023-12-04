@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+
+import { UserEntity } from './entities/user.entity';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -10,11 +13,16 @@ export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
+    const encryptedPassword = await bcrypt.hash(createUserDto.password, 10);
+
     const user = await this.prisma.users.create({
-      data: createUserDto,
+      data: {
+        ...createUserDto,
+        password: encryptedPassword,
+      },
     });
 
-    return user;
+    return this.removePassword(user);
   }
 
   async findAll() {
@@ -30,7 +38,9 @@ export class UserService {
       },
     });
 
-    return user;
+    if (!user) return null;
+
+    return this.removePassword(user);
   }
 
   async findByEmail(email: string) {
@@ -44,6 +54,12 @@ export class UserService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
+    if (updateUserDto.password != null) {
+      const encryptedPassword = await bcrypt.hash(updateUserDto.password, 10);
+
+      updateUserDto.password = encryptedPassword;
+    }
+
     const user = await this.prisma.users.update({
       where: {
         id,
@@ -51,7 +67,7 @@ export class UserService {
       data: updateUserDto,
     });
 
-    return user;
+    return this.removePassword(user);
   }
 
   async remove(id: string) {
@@ -61,6 +77,13 @@ export class UserService {
       },
     });
 
-    return user;
+    return this.removePassword(user);
+  }
+
+  private removePassword(user: UserEntity): UserEntity {
+    return {
+      ...user,
+      password: null,
+    };
   }
 }
