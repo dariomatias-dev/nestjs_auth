@@ -29,7 +29,11 @@ export class LoginGuard implements CanActivate {
       return false;
     }
 
-    request.user = user;
+    request.user = {
+      id: user.id,
+      email: user.email,
+      roles: user.roles,
+    };
 
     return true;
   }

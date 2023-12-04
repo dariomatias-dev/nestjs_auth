@@ -13,11 +13,12 @@ export class AuthController {
   @UseGuards(LoginGuard)
   @Post('login')
   login(@Req() req: UserRequest) {
-    return this.authService.generateTokens();
+    return this.authService.generateTokens(req.user);
   }
 
   @Get('refresh')
   refresh() {
-    return this.authService.generateTokens();
+    return '';
+    //return this.authService.generateTokens();
   }
 }

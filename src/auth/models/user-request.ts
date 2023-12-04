@@ -1,7 +1,7 @@
 import { FastifyRequest } from 'fastify';
 
-import { UserEntity } from 'src/user/entities/user.entity';
+import { UserFromJwt } from './user-from-jwt';
 
 export interface UserRequest extends FastifyRequest {
-  user: UserEntity;
+  user: UserFromJwt;
 }
