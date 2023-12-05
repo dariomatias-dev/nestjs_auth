@@ -13,11 +13,14 @@ import { UserRequest } from './models/user-request';
 
 import { UserService } from 'src/user/user.service';
 
+import { PrismaService } from 'src/prisma/prisma.service';
+
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly prisma: PrismaService,
   ) {}
 
   async validateUser(email: string, password: string) {
@@ -46,6 +49,20 @@ export class AuthService {
       TokenType.Refresh,
       '7d',
     );
+
+    await this.prisma.users.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        tokens: {
+          update: {
+            accessToken: access_token,
+            refreshToken: refresh_token,
+          },
+        },
+      },
+    });
 
     return {
       access_token,
@@ -95,6 +112,15 @@ export class AuthService {
 
       if (!user) {
         throw new Error();
+      }
+
+      const userToken =
+        tokenType == TokenType.Access
+          ? user.tokens.accessToken
+          : user.tokens.refreshToken;
+
+      if (token != userToken) {
+        throw new UnauthorizedException();
       }
 
       request.user = payload;

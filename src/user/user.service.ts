@@ -21,6 +21,12 @@ export class UserService {
         ...createUserDto,
         password: encryptedPassword,
         roles: [Role.Admin],
+        tokens: {
+          create: {
+            accessToken: '',
+            refreshToken: '',
+          },
+        },
       },
     });
 
@@ -35,6 +41,12 @@ export class UserService {
         ...createUserDto,
         password: encryptedPassword,
         roles: [Role.User],
+        tokens: {
+          create: {
+            accessToken: '',
+            refreshToken: '',
+          },
+        },
       },
     });
 
@@ -63,6 +75,9 @@ export class UserService {
     const user = await this.prisma.users.findUnique({
       where: {
         email,
+      },
+      include: {
+        tokens: true,
       },
     });
 
