@@ -12,15 +12,14 @@ import { Role } from 'src/enums/role.enum';
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
-
-  async createAdmin(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto, roles: Role[]) {
     const encryptedPassword = await bcrypt.hash(createUserDto.password, 10);
 
     const user = await this.prisma.users.create({
       data: {
         ...createUserDto,
         password: encryptedPassword,
-        roles: [Role.Admin],
+        roles,
         tokens: {
           create: {
             accessToken: '',
@@ -30,27 +29,7 @@ export class UserService {
       },
     });
 
-    return this.removePassword(user);
-  }
-
-  async create(createUserDto: CreateUserDto) {
-    const encryptedPassword = await bcrypt.hash(createUserDto.password, 10);
-
-    const user = await this.prisma.users.create({
-      data: {
-        ...createUserDto,
-        password: encryptedPassword,
-        roles: [Role.User],
-        tokens: {
-          create: {
-            accessToken: '',
-            refreshToken: '',
-          },
-        },
-      },
-    });
-
-    return this.removePassword(user);
+    return this._removePassword(user);
   }
 
   async findAll() {
@@ -68,7 +47,7 @@ export class UserService {
 
     if (!user) return null;
 
-    return this.removePassword(user);
+    return this._removePassword(user);
   }
 
   async findByEmail(email: string) {
@@ -98,7 +77,7 @@ export class UserService {
       data: updateUserDto,
     });
 
-    return this.removePassword(user);
+    return this._removePassword(user);
   }
 
   async remove(id: string) {
@@ -108,10 +87,10 @@ export class UserService {
       },
     });
 
-    return this.removePassword(user);
+    return this._removePassword(user);
   }
 
-  private removePassword(user: UserEntity): UserEntity {
+  private _removePassword(user: UserEntity): UserEntity {
     return {
       ...user,
       password: null,

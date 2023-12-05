@@ -32,13 +32,13 @@ export class UserController {
   @UseGuards(RolesGuard)
   @Post('admin-user')
   createAdmin(@Body() createUserDto: CreateUserDto) {
-    return this.userService.createAdmin(createUserDto);
+    return this.userService.create(createUserDto, [Role.Admin]);
   }
 
   @IsPublic()
   @Post('user')
   create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+    return this.userService.create(createUserDto, [Role.User]);
   }
 
   @Roles(Role.Admin)

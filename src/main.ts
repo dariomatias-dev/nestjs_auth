@@ -11,6 +11,7 @@ import { PrismaNotFoundExceptionFilter } from './exception-filters/prisma-not-fo
 import { UniqueFieldExceptionFilter } from './exception-filters/unique-field.exception-filter';
 import { UserService } from './user/user.service';
 import { CreateUserDto } from './user/dto/create-user.dto';
+import { Role } from './enums/role.enum';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -51,7 +52,7 @@ async function bootstrap() {
       password,
     };
 
-    await userService.createAdmin(data);
+    await userService.create(data, [Role.Admin]);
   }
 
   await app.listen(3001);
